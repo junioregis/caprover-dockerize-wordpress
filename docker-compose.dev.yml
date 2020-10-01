@@ -1,0 +1,45 @@
+version: "3.7"
+
+volumes:
+  app:
+  db:
+
+services:
+  app:
+    restart: "no"
+    build: .
+    ports:
+      - 3000:80
+    volumes:
+      - app:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    depends_on:
+      - db
+
+  db:
+    restart: "no"
+    image: mariadb:10.5.5
+    expose:
+      - 3306
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  db_admin:
+    restart: "no"
+    image: phpmyadmin/phpmyadmin:5.0.2
+    ports:
+      - 8000:80
+    environment:
+      PMA_ARBITRARY: "1"
+      UPLOAD_LIMIT: 100M
+    depends_on:
+      - db

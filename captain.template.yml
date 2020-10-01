@@ -1,0 +1,53 @@
+captainVersion: 4
+
+caproverOneClickApp:
+  instructions:
+    start: >-
+      Description.
+    end: >
+      Description.
+  displayName: Migrate
+  isOfficial: false
+  description: Description
+  documentation: Documentation
+
+services:
+  $$cap_appname-app:
+    restart: always
+    image: alpine:3.12
+    volumes:
+      - $$cap_appname-app:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: srv-captain--$$cap_appname-db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    depends_on:
+      - $$cap_appname-db
+    caproverExtra:
+      containerHttpPort: "80"
+
+  $$cap_appname-db:
+    restart: always
+    image: mariadb:10.5.5
+    volumes:
+      - $$cap_appname-db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    caproverExtra:
+      notExposeAsWebApp: "true"
+      containerHttpPort: "3306"
+
+  $$cap_appname-db-admin:
+    restart: always
+    image: phpmyadmin/phpmyadmin:5.0.2
+    environment:
+      PMA_ARBITRARY: "1"
+      UPLOAD_LIMIT: 100M
+    depends_on:
+      - $$cap_appname-db
+    caproverExtra:
+      containerHttpPort: "80"
